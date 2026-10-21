@@ -121,8 +121,6 @@
             100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(var(--rot)); opacity: 0; }
         }
 
-        .note-symbol { font-family: sans-serif; }
-
         @keyframes raceCardShake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-7px); }
@@ -219,6 +217,39 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+
+        const noteTypeBySymbol = {
+            '&#119133;': 'whole',
+            '&#119134;': 'half',
+            '&#119135;': 'quarter',
+            '&#119136;': 'eighth'
+        };
+
+        const NoteSymbol = ({ symbol, type, className = '' }) => {
+            const noteType = type || noteTypeBySymbol[symbol];
+            const isWhole = noteType === 'whole';
+            const isHalf = noteType === 'half';
+            const hasStem = !isWhole;
+
+            return (
+                <svg viewBox="0 0 64 80" className={className} aria-hidden="true" focusable="false">
+                    {hasStem && <path d="M40 59V10" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />}
+                    <ellipse
+                        cx="29"
+                        cy="64"
+                        rx="13"
+                        ry="8"
+                        transform="rotate(-22 29 64)"
+                        fill={isWhole || isHalf ? 'white' : 'currentColor'}
+                        stroke="currentColor"
+                        strokeWidth={isWhole || isHalf ? '4' : '2'}
+                    />
+                    {noteType === 'eighth' && (
+                        <path d="M40 11C55 15 59 26 51 39C51 29 46 25 40 23Z" fill="currentColor" />
+                    )}
+                </svg>
+            );
+        };
 
         // Audio System
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -337,7 +368,7 @@
                 <div className="flex flex-col items-center w-full my-6 bg-white/80 p-3 sm:p-8 rounded-3xl border-4 border-indigo-200 shadow-inner">
                     {/* Whole */}
                     <div className="flex flex-col items-center mb-6">
-                        <div className="text-7xl mb-2 text-red-500 note-symbol">&#119133;</div>
+                        <NoteSymbol type="whole" className="w-16 h-20 mb-2 text-red-500" />
                         <div className="text-xl font-bold text-red-600 bg-red-100 px-4 py-1 rounded-full">Ціла нота (4 рахунки)</div>
                         <div className="w-1 h-10 bg-gray-300 mt-2"></div>
                     </div>
@@ -347,7 +378,7 @@
                         <div className="absolute top-0 left-[25%] right-[25%] h-1 bg-gray-300"></div>
                         {[1,2].map(i => (
                             <div key={i} className="flex flex-col items-center w-1/2 pt-2">
-                                <div className="text-6xl text-blue-500 note-symbol">&#119134;</div>
+                                <NoteSymbol type="half" className="w-14 h-[4.5rem] text-blue-500" />
                                 <div className="text-lg font-bold text-blue-600">Половинна (2)</div>
                                 <div className="w-1 h-10 bg-gray-300 mt-2"></div>
                             </div>
@@ -359,7 +390,7 @@
                         <div className="absolute top-0 left-[12.5%] right-[12.5%] h-1 bg-gray-300"></div>
                         {[1,2,3,4].map(i => (
                             <div key={i} className="flex flex-col items-center w-1/4 pt-2">
-                                <div className="text-5xl text-green-600 note-symbol">&#119135;</div>
+                                <NoteSymbol type="quarter" className="w-12 h-16 text-green-600" />
                                 <div className="text-md font-bold text-green-600 hidden md:block">Четвертна (1)</div>
                                 <div className="text-md font-bold text-green-600 md:hidden">Чверть</div>
                                 <div className="w-1 h-10 bg-gray-300 mt-2"></div>
@@ -373,7 +404,7 @@
                             <div className="absolute top-0 left-[6.25%] right-[6.25%] h-1 bg-gray-300"></div>
                             {['1', 'і', '2', 'і', '3', 'і', '4', 'і'].map((count, i) => (
                                 <div key={i} className="flex flex-col items-center pt-2 px-1">
-                                    <div className="text-4xl text-purple-600 note-symbol">&#119136;</div>
+                                    <NoteSymbol type="eighth" className="w-10 h-14 text-purple-600" />
                                     <div className="text-[10px] sm:text-sm font-bold text-purple-600 leading-tight">Восьма</div>
                                     <div className="text-[10px] sm:text-sm font-bold text-purple-600 leading-tight">{count}</div>
                                 </div>
@@ -504,7 +535,7 @@
                                         ${isWrong && selected === idx ? 'shake' : ''}
                                     `}
                                 >
-                                    <div className={`text-6xl mb-2 note-symbol ${opt.color}`} dangerouslySetInnerHTML={{__html: opt.symbol}}></div>
+                                    <NoteSymbol symbol={opt.symbol} className={`w-14 h-16 mb-2 ${opt.color}`} />
                                     <p className="text-lg font-black text-gray-800">{opt.name}</p>
                                 </div>
                             ))}
@@ -597,7 +628,7 @@
                     <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16 mb-8">
                         {/* Note 1 */}
                         <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-lg border-4 border-indigo-100 w-full max-w-[280px]">
-                            <div className={`text-8xl mb-4 note-symbol ${task.n1.color}`} dangerouslySetInnerHTML={{__html: task.n1.symbol}}></div>
+                            <NoteSymbol symbol={task.n1.symbol} className={`w-20 h-24 mb-4 ${task.n1.color}`} />
                             <button 
                                 onClick={() => playNote(task.n1.dur, 1)}
                                 disabled={isPlaying}
@@ -619,7 +650,7 @@
 
                         {/* Note 2 */}
                         <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-lg border-4 border-indigo-100 w-full max-w-[280px]">
-                            <div className={`text-8xl mb-4 note-symbol ${task.n2.color}`} dangerouslySetInnerHTML={{__html: task.n2.symbol}}></div>
+                            <NoteSymbol symbol={task.n2.symbol} className={`w-20 h-24 mb-4 ${task.n2.color}`} />
                             <button 
                                 onClick={() => playNote(task.n2.dur, 2)}
                                 disabled={isPlaying}
@@ -1025,7 +1056,7 @@
                             {task.eq.map((item, idx) => (
                                 typeof item === 'string'
                                     ? <span key={idx} className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-400">{item}</span>
-                                    : <span key={idx} className={`text-4xl sm:text-5xl md:text-7xl note-symbol ${item.c}`} dangerouslySetInnerHTML={{__html: item.s}}></span>
+                                    : <NoteSymbol key={idx} symbol={item.s} className={`w-10 h-12 sm:w-12 sm:h-14 md:w-16 md:h-20 ${item.c}`} />
                             ))}
                             <span className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-400">=</span>
                             <span className="text-4xl sm:text-5xl md:text-7xl text-gray-300 font-black">?</span>
@@ -1043,7 +1074,7 @@
                                     ${isWrong && selected === idx ? 'shake' : ''}
                                 `}
                             >
-                                <div className={`text-6xl mb-2 note-symbol ${opt.color}`} dangerouslySetInnerHTML={{__html: opt.symbol}}></div>
+                                <NoteSymbol symbol={opt.symbol} className={`w-14 h-16 mb-2 ${opt.color}`} />
                                 <p className="text-xl font-black text-gray-800">{opt.name}</p>
                             </div>
                         ))}
@@ -1245,7 +1276,7 @@
                                                 disabled={moving}
                                                 className={`flex min-h-24 flex-col items-center justify-center rounded-2xl border-4 bg-[#f7f4ef] p-2 sm:p-3 shadow-md transition-all ${note.border} ${wrongChoice === note.duration ? 'race-wrong border-red-400 bg-red-50' : 'border-gray-200'} ${moving ? 'opacity-60 cursor-wait' : 'hover:-translate-y-1 hover:shadow-lg'}`}
                                             >
-                                                <span className={`note-symbol text-4xl sm:text-5xl ${note.color}`} dangerouslySetInnerHTML={{__html: note.symbol}} />
+                                                <NoteSymbol symbol={note.symbol} className={`w-10 h-12 sm:w-12 sm:h-14 ${note.color}`} />
                                                 <span className="text-xs sm:text-sm font-bold text-gray-500">{durationLabel(note.duration)}</span>
                                             </button>
                                         ))}
