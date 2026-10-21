@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Музичні Тривалості для Дітей</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #34d399, #2dd4bf, #3b82f6, #8b5cf6);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #1f2937;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .nav-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .nav-btn.active {
+            background-color: #fcd34d;
+            color: #b45309;
+            border-color: #fbbf24;
+            transform: scale(1.05);
+            font-weight: 900;
+        }
+
+        .bounce-in { animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) both; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out both; }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        .pulse-btn { animation: pulse 2s infinite; }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(250, 204, 21, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+        }
+
+        .star-particle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            animation: shootStar 1s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes shootStar {
+            0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 1; }
+            50% { opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(var(--rot)); opacity: 0; }
+        }
+
+        .note-symbol { font-family: sans-serif; }
+
+        @keyframes raceCardShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+
+        @keyframes finishPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .race-wrong { animation: raceCardShake 0.45s ease-in-out; }
+        .race-finish { animation: finishPop 0.7s cubic-bezier(.2,.8,.2,1) both; }
+        .race-track {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        @media (min-width: 1024px) {
+            nav.race-nav {
+                padding: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            main.race-main {
+                padding-top: 0.5rem;
+                padding-bottom: 0.25rem;
+                align-items: center;
+            }
+
+            .race-game-panel {
+                max-width: 84rem;
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+                padding: 1.25rem;
+            }
+
+            .race-track {
+                height: min(47vh, 560px);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .glass-panel {
+                width: calc(100% - 1.5rem);
+                margin: 0.75rem;
+                padding: 1rem;
+                border-width: 2px;
+                border-radius: 1.25rem;
+            }
+
+            .glass-panel h1,
+            .glass-panel h2 {
+                font-size: clamp(1.5rem, 7vw, 2rem);
+                line-height: 1.2;
+                letter-spacing: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .glass-panel p,
+            .glass-panel button {
+                overflow-wrap: anywhere;
+            }
+
+            .glass-panel .absolute.z-10 {
+                box-sizing: border-box;
+                max-width: calc(100% - 1rem);
+                padding: 1rem;
+                font-size: clamp(1.25rem, 5vw, 2rem);
+            }
+
+            nav {
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            main {
+                padding-top: 0.5rem;
+                padding-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Audio System
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        const playTone = (freq, type, duration, vol = 0.5) => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.value = freq;
+            
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        };
+
+        const playRhythm = (notes, tempo = 90) => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const beatDuration = 60 / tempo;
+            let startTime = audioCtx.currentTime + 0.1;
+
+            notes.forEach(note => {
+                const duration = note.type * beatDuration;
+                if (note.type > 0) {
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+
+                    oscillator.type = 'triangle'; // Non-harsh sound
+                    oscillator.frequency.value = 523.25; // C5
+                    
+                    gainNode.gain.setValueAtTime(0, startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.5, startTime + 0.05);
+                    gainNode.gain.linearRampToValueAtTime(0, startTime + (duration * 0.9)); // Leave slight gap
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + duration);
+                }
+                startTime += duration;
+            });
+        };
+
+        const playCorrectSound = () => {
+            playTone(523.25, 'sine', 0.1, 0.3); // C5
+            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.3), 100); // E5
+            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.3), 200); // G5
+        };
+        const playWrongSound = () => {
+            playTone(300, 'sawtooth', 0.2, 0.2);
+            setTimeout(() => playTone(250, 'sawtooth', 0.3, 0.2), 150);
+        };
+        const playClickSound = () => playTone(800, 'square', 0.05, 0.1);
+
+        const CelebrationStars = ({ active }) => {
+            if (!active) return null;
+            
+            const stars = Array.from({ length: 30 }).map((_, i) => {
+                const angle = (Math.PI * 2 * i) / 30;
+                const distance = 100 + Math.random() * 200;
+                const tx = Math.cos(angle) * distance + 'px';
+                const ty = Math.sin(angle) * distance + 'px';
+                const rot = (Math.random() * 360) + 'deg';
+                const color = ['#FCD34D', '#F472B6', '#60A5FA', '#34D399'][Math.floor(Math.random() * 4)];
+                
+                return (
+                    <svg key={i} className="star-particle" style={{ '--tx': tx, '--ty': ty, '--rot': rot }} viewBox="0 0 24 24" fill={color}>
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                    </svg>
+                );
+            });
+
+            return (
+                <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
+                    {stars}
+                </div>
+            );
+        };
+
+        const ScoreBoard = ({ score, maxScore = 5 }) => (
+            <div className="flex justify-center flex-wrap gap-2 mb-6 max-w-full px-4">
+                {Array.from({ length: maxScore }).map((_, i) => (
+                    <svg key={i} className={`w-8 h-8 md:w-10 md:h-10 transition-all duration-500 ${i < score ? 'scale-110' : 'opacity-30'}`} viewBox="0 0 24 24" fill={i < score ? "#F59E0B" : "#CBD5E1"}>
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                    </svg>
+                ))}
+            </div>
+        );
+
+        // Pizza Graphics
+        const PizzaBase = ({ children }) => (
+            <svg viewBox="0 0 100 100" className="w-full h-full max-w-[200px] mx-auto drop-shadow-2xl transition-transform hover:scale-105">
+                {children}
+            </svg>
+        );
+        const WholePizza = () => <PizzaBase><circle cx="50" cy="50" r="48" fill="#FCD34D" stroke="#B45309" strokeWidth="2"/><circle cx="50" cy="50" r="42" fill="#FEF08A"/><circle cx="30" cy="30" r="6" fill="#EF4444"/><circle cx="70" cy="35" r="7" fill="#EF4444"/><circle cx="40" cy="65" r="6" fill="#EF4444"/><circle cx="65" cy="70" r="5" fill="#EF4444"/><circle cx="50" cy="15" r="5" fill="#EF4444"/><circle cx="50" cy="85" r="5" fill="#EF4444"/><circle cx="15" cy="50" r="5" fill="#EF4444"/><circle cx="85" cy="50" r="5" fill="#EF4444"/></PizzaBase>;
+        const HalfPizza = () => <PizzaBase><path d="M 50 2 A 48 48 0 0 0 50 98 Z" fill="#FCD34D" stroke="#B45309" strokeWidth="2"/><path d="M 50 8 A 42 42 0 0 0 50 92 Z" fill="#FEF08A"/><circle cx="30" cy="30" r="6" fill="#EF4444"/><circle cx="40" cy="65" r="6" fill="#EF4444"/><circle cx="25" cy="50" r="5" fill="#EF4444"/></PizzaBase>;
+        const QuarterPizza = () => <PizzaBase><path d="M 50 50 L 2 50 A 48 48 0 0 1 50 2 Z" fill="#FCD34D" stroke="#B45309" strokeWidth="2"/><path d="M 50 50 L 8 50 A 42 42 0 0 1 50 8 Z" fill="#FEF08A"/><circle cx="30" cy="30" r="5" fill="#EF4444"/><circle cx="20" cy="40" r="4" fill="#EF4444"/></PizzaBase>;
+        const EighthPizza = () => <PizzaBase><path d="M 50 50 L 2 50 A 48 48 0 0 1 16 16 Z" fill="#FCD34D" stroke="#B45309" strokeWidth="2"/><path d="M 50 50 L 8 50 A 42 42 0 0 1 20 20 Z" fill="#FEF08A"/><circle cx="25" cy="40" r="4" fill="#EF4444"/></PizzaBase>;
+
+        const Overview = () => (
+            <div className="glass-panel rounded-3xl p-8 max-w-5xl w-full text-center bounce-in mx-4 my-8">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-indigo-700 mb-6 drop-shadow-sm uppercase tracking-wider">
+                    🎵 Дерево Тривалостей 🎵
+                </h1>
+                <div className="flex flex-col items-center w-full my-6 bg-white/80 p-3 sm:p-8 rounded-3xl border-4 border-indigo-200 shadow-inner">
+                    {/* Whole */}
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="text-7xl mb-2 text-red-500 note-symbol">&#119133;</div>
+                        <div className="text-xl font-bold text-red-600 bg-red-100 px-4 py-1 rounded-full">Ціла нота (4 рахунки)</div>
+                        <div className="w-1 h-10 bg-gray-300 mt-2"></div>
+                    </div>
+                    
+                    {/* Halves */}
+                    <div className="flex justify-between w-full max-w-md relative mb-6">
+                        <div className="absolute top-0 left-[25%] right-[25%] h-1 bg-gray-300"></div>
+                        {[1,2].map(i => (
+                            <div key={i} className="flex flex-col items-center w-1/2 pt-2">
+                                <div className="text-6xl text-blue-500 note-symbol">&#119134;</div>
+                                <div className="text-lg font-bold text-blue-600">Половинна (2)</div>
+                                <div className="w-1 h-10 bg-gray-300 mt-2"></div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Quarters */}
+                    <div className="flex justify-between w-full max-w-3xl relative mb-6">
+                        <div className="absolute top-0 left-[12.5%] right-[12.5%] h-1 bg-gray-300"></div>
+                        {[1,2,3,4].map(i => (
+                            <div key={i} className="flex flex-col items-center w-1/4 pt-2">
+                                <div className="text-5xl text-green-600 note-symbol">&#119135;</div>
+                                <div className="text-md font-bold text-green-600 hidden md:block">Четвертна (1)</div>
+                                <div className="text-md font-bold text-green-600 md:hidden">Чверть</div>
+                                <div className="w-1 h-10 bg-gray-300 mt-2"></div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Eighths */}
+                    <div className="w-full overflow-x-auto">
+                        <div className="grid grid-cols-8 w-full min-w-[480px] max-w-4xl relative">
+                            <div className="absolute top-0 left-[6.25%] right-[6.25%] h-1 bg-gray-300"></div>
+                            {['1', 'і', '2', 'і', '3', 'і', '4', 'і'].map((count, i) => (
+                                <div key={i} className="flex flex-col items-center pt-2 px-1">
+                                    <div className="text-4xl text-purple-600 note-symbol">&#119136;</div>
+                                    <div className="text-[10px] sm:text-sm font-bold text-purple-600 leading-tight">Восьма</div>
+                                    <div className="text-[10px] sm:text-sm font-bold text-purple-600 leading-tight">{count}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const PizzaGame = ({ triggerCelebration }) => {
+            const [score, setScore] = useState(0);
+            const [currentTask, setCurrentTask] = useState(0);
+            const [selected, setSelected] = useState(null);
+            const [isWrong, setIsWrong] = useState(false);
+
+            const tasks = [
+                {
+                    img: WholePizza, q: "Це ЦІЛА піца. Яка нота їй відповідає?",
+                    correct: 0, textDesc: "Будемо їсти довго-довго цілу піцу!",
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла нота', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна нота', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертна нота', color: 'text-green-600' },
+                        { symbol: '&#119136;', name: 'Восьма нота', color: 'text-purple-600' }
+                    ]
+                },
+                {
+                    img: HalfPizza, q: "Це ПОЛОВИНА піци. Знайди її нотку!",
+                    correct: 1, textDesc: "Їмо половину не так довго, але ситно!",
+                    options: [
+                        { symbol: '&#119135;', name: 'Четвертна нота', color: 'text-green-600' },
+                        { symbol: '&#119134;', name: 'Половинна нота', color: 'text-blue-500' },
+                        { symbol: '&#119136;', name: 'Восьма нота', color: 'text-purple-600' },
+                        { symbol: '&#119133;', name: 'Ціла нота', color: 'text-red-500' }
+                    ]
+                },
+                {
+                    img: QuarterPizza, q: "ЧВЕРТЬ піци (один шматочок з чотирьох). Де її нота?",
+                    correct: 2, textDesc: "Один шматочок з'їмо швиденько - на 'Раз'!",
+                    options: [
+                        { symbol: '&#119136;', name: 'Восьма нота', color: 'text-purple-600' },
+                        { symbol: '&#119133;', name: 'Ціла нота', color: 'text-red-500' },
+                        { symbol: '&#119135;', name: 'Четвертна нота', color: 'text-green-600' },
+                        { symbol: '&#119134;', name: 'Половинна нота', color: 'text-blue-500' }
+                    ]
+                },
+                {
+                    img: EighthPizza, q: "Малесенький шматочок - ВОСЬМА частина. Яка це нота?",
+                    correct: 3, textDesc: "З'їмо за секунду, вона біжить дуже швидко!",
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла нота', color: 'text-red-500' },
+                        { symbol: '&#119135;', name: 'Четвертна нота', color: 'text-green-600' },
+                        { symbol: '&#119134;', name: 'Половинна нота', color: 'text-blue-500' },
+                        { symbol: '&#119136;', name: 'Восьма нота', color: 'text-purple-600' }
+                    ]
+                },
+                { // Round 5 - Random repeat to reach 5 score
+                    img: WholePizza, q: "Закріплюємо! ЦІЛА піца - це...",
+                    correct: 1, textDesc: "Найдовша нота!",
+                    options: [
+                        { symbol: '&#119134;', name: 'Половинна нота', color: 'text-blue-500' },
+                        { symbol: '&#119133;', name: 'Ціла нота', color: 'text-red-500' },
+                        { symbol: '&#119136;', name: 'Восьма нота', color: 'text-purple-600' },
+                        { symbol: '&#119135;', name: 'Четвертна нота', color: 'text-green-600' }
+                    ]
+                }
+            ];
+
+            const handleSelect = (idx) => {
+                if (selected !== null) return;
+                setSelected(idx);
+                if (idx === tasks[currentTask].correct) {
+                    playCorrectSound();
+                    triggerCelebration();
+                    setTimeout(() => {
+                        setSelected(null);
+                        if (score < 4) {
+                            setScore(s => s + 1);
+                            setCurrentTask(t => t + 1);
+                        } else {
+                            setScore(5);
+                        }
+                    }, 1500);
+                } else {
+                    playWrongSound();
+                    setIsWrong(true);
+                    setTimeout(() => {
+                        setIsWrong(false);
+                        setSelected(null);
+                    }, 1000);
+                }
+            };
+
+            if (score === 5) {
+                return (
+                    <div className="glass-panel rounded-3xl p-12 max-w-2xl w-full text-center bounce-in mx-4">
+                        <div className="text-8xl mb-6">🍕🏆</div>
+                        <h2 className="text-5xl font-black text-orange-500 mb-6">Ти Піца-Маестро!</h2>
+                        <p className="text-2xl font-bold">Усі нотки-піци зібрані правильно!</p>
+                        <button onClick={() => { setScore(0); setCurrentTask(0); }} className="mt-8 bg-green-500 text-white font-black py-3 px-8 rounded-full text-xl hover:scale-110 transition-transform">Грати ще раз</button>
+                    </div>
+                );
+            }
+
+            const task = tasks[currentTask];
+            const Graphic = task.img;
+
+            return (
+                <div className="glass-panel rounded-3xl p-6 md:p-10 max-w-5xl w-full text-center fade-in mx-4 my-8">
+                    <ScoreBoard score={score} />
+                    <h2 className="text-3xl md:text-4xl font-black text-orange-600 mb-4">{task.q}</h2>
+                    <p className="text-xl text-gray-700 font-bold mb-8">{task.textDesc}</p>
+                    
+                    <div className="flex flex-col lg:flex-row items-center justify-around gap-8">
+                        <div className="flex-1 w-full max-w-sm flex justify-center bg-white/50 p-8 rounded-full shadow-inner">
+                            <Graphic />
+                        </div>
+                        
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                            {task.options.map((opt, idx) => (
+                                <div 
+                                    key={idx}
+                                    onClick={() => handleSelect(idx)}
+                                    className={`
+                                        bg-white p-4 rounded-2xl border-4 cursor-pointer flex flex-col items-center justify-center min-h-[140px] transition-all shadow-md
+                                        ${selected === idx ? (idx === task.correct ? 'border-green-500 bg-green-100 scale-105' : 'border-red-500 bg-red-100 shake') : 'border-gray-200 hover:border-orange-400 hover:scale-105'}
+                                        ${isWrong && selected === idx ? 'shake' : ''}
+                                    `}
+                                >
+                                    <div className={`text-6xl mb-2 note-symbol ${opt.color}`} dangerouslySetInnerHTML={{__html: opt.symbol}}></div>
+                                    <p className="text-lg font-black text-gray-800">{opt.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DurationGame = ({ triggerCelebration }) => {
+            const [score, setScore] = useState(0);
+            const [currentTask, setCurrentTask] = useState(0);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [activeNote, setActiveNote] = useState(null);
+            const [showFeedback, setShowFeedback] = useState(false);
+            const [isCorrect, setIsCorrect] = useState(false);
+
+            // Times in seconds. Adjusted for kid's patience.
+            const notesDef = {
+                whole: { name: 'Ціла', dur: 2.0, symbol: '&#119133;', color: 'text-red-500' },
+                half: { name: 'Половинна', dur: 1.0, symbol: '&#119134;', color: 'text-blue-500' },
+                quarter: { name: 'Четвертна', dur: 0.5, symbol: '&#119135;', color: 'text-green-600' },
+                eighth: { name: 'Восьма', dur: 0.25, symbol: '&#119136;', color: 'text-purple-600' }
+            };
+
+            const tasks = [
+                { n1: notesDef.half, n2: notesDef.whole, correct: 2, q: "Що звучить ДОВШЕ?" },
+                { n1: notesDef.quarter, n2: notesDef.half, correct: 2, q: "Яка нотка тягнеться ДОВШЕ?" },
+                { n1: notesDef.eighth, n2: notesDef.quarter, correct: 2, q: "Що довше?" },
+                { n1: notesDef.whole, n2: notesDef.quarter, correct: 1, q: "Хто співає ДОВШЕ?" },
+                { n1: notesDef.eighth, n2: notesDef.half, correct: 2, q: "Знайди ДОВШУ ноту!" }
+            ];
+
+            const playNote = (dur, id) => {
+                if (isPlaying) return;
+                setIsPlaying(true);
+                setActiveNote(id);
+                
+                playTone(440, 'triangle', dur, 0.6); // A4
+                
+                setTimeout(() => {
+                    setIsPlaying(false);
+                    setActiveNote(null);
+                }, dur * 1000 + 100);
+            };
+
+            const handleGuess = (id) => {
+                if (isPlaying) return;
+                const correct = id === tasks[currentTask].correct;
+                setIsCorrect(correct);
+                setShowFeedback(true);
+                
+                if (correct) {
+                    playCorrectSound();
+                    triggerCelebration();
+                    setTimeout(() => { 
+                        setShowFeedback(false); 
+                        if (score < 4) {
+                            setScore(s => s + 1);
+                            setCurrentTask(t => t + 1);
+                        } else {
+                            setScore(5);
+                        }
+                    }, 1500);
+                } else {
+                    playWrongSound();
+                    setTimeout(() => setShowFeedback(false), 1200);
+                }
+            };
+
+            if (score === 5) {
+                return (
+                    <div className="glass-panel rounded-3xl p-12 max-w-2xl w-full text-center bounce-in mx-4">
+                        <div className="text-8xl mb-6">🐰👂🏆</div>
+                        <h2 className="text-5xl font-black text-indigo-500 mb-6">Супер Слухач!</h2>
+                        <p className="text-2xl font-bold">Твої вушка чують кожну нотку!</p>
+                        <button onClick={() => { setScore(0); setCurrentTask(0); }} className="mt-8 bg-indigo-500 text-white font-black py-3 px-8 rounded-full text-xl hover:scale-110 transition-transform">Грати ще раз</button>
+                    </div>
+                );
+            }
+
+            const task = tasks[currentTask];
+
+            return (
+                <div className="glass-panel rounded-3xl p-8 md:p-12 max-w-4xl w-full text-center fade-in mx-4 my-8 relative overflow-hidden">
+                    <ScoreBoard score={score} />
+                    <h2 className="text-3xl md:text-5xl font-black text-indigo-700 mb-4">{task.q}</h2>
+                    <p className="text-xl text-gray-700 font-bold mb-8">Послухай обидві і натисни "Це вона!" під тією, що звучить найдовше.</p>
+                    
+                    <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16 mb-8">
+                        {/* Note 1 */}
+                        <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-lg border-4 border-indigo-100 w-full max-w-[280px]">
+                            <div className={`text-8xl mb-4 note-symbol ${task.n1.color}`} dangerouslySetInnerHTML={{__html: task.n1.symbol}}></div>
+                            <button 
+                                onClick={() => playNote(task.n1.dur, 1)}
+                                disabled={isPlaying}
+                                className={`
+                                    w-24 h-24 rounded-full mb-6 flex justify-center items-center text-4xl shadow-xl transition-all border-4 border-white
+                                    ${activeNote === 1 ? 'bg-yellow-400 scale-110' : 'bg-indigo-400 hover:bg-indigo-500 hover:scale-105'}
+                                    ${isPlaying && activeNote !== 1 ? 'opacity-50 grayscale' : ''}
+                                `}
+                            >
+                                {activeNote === 1 ? '🎶' : '▶️'}
+                            </button>
+                            <button 
+                                onClick={() => handleGuess(1)}
+                                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-black py-4 rounded-2xl border-4 border-gray-300 text-xl transition-transform hover:scale-105"
+                            >
+                                Це вона!
+                            </button>
+                        </div>
+
+                        {/* Note 2 */}
+                        <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-lg border-4 border-indigo-100 w-full max-w-[280px]">
+                            <div className={`text-8xl mb-4 note-symbol ${task.n2.color}`} dangerouslySetInnerHTML={{__html: task.n2.symbol}}></div>
+                            <button 
+                                onClick={() => playNote(task.n2.dur, 2)}
+                                disabled={isPlaying}
+                                className={`
+                                    w-24 h-24 rounded-full mb-6 flex justify-center items-center text-4xl shadow-xl transition-all border-4 border-white
+                                    ${activeNote === 2 ? 'bg-yellow-400 scale-110' : 'bg-pink-400 hover:bg-pink-500 hover:scale-105'}
+                                    ${isPlaying && activeNote !== 2 ? 'opacity-50 grayscale' : ''}
+                                `}
+                            >
+                                {activeNote === 2 ? '🎶' : '▶️'}
+                            </button>
+                            <button 
+                                onClick={() => handleGuess(2)}
+                                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-black py-4 rounded-2xl border-4 border-gray-300 text-xl transition-transform hover:scale-105"
+                            >
+                                Це вона!
+                            </button>
+                        </div>
+                    </div>
+
+                    {showFeedback && (
+                        <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-black p-8 rounded-3xl shadow-2xl z-10 ${isCorrect ? 'bg-green-400 text-white' : 'bg-red-400 text-white shake'}`}>
+                            {isCorrect ? 'Молодець! 🎉' : 'Спробуй ще! 👂'}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const RhythmGame = ({ triggerCelebration }) => {
+            const [score, setScore] = useState(0);
+            const [currentTask, setCurrentTask] = useState(0);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [showFeedback, setShowFeedback] = useState(false);
+            const [isCorrect, setIsCorrect] = useState(false);
+            const [selectedId, setSelectedId] = useState(null);
+
+            // SVG Note Components for rhythms
+            const RQuarter = ({x}) => <g transform={`translate(${x}, 25)`}><ellipse cx="0" cy="0" rx="6" ry="4" fill="#1E293B" transform="rotate(-20)"/><line x1="5" y1="0" x2="5" y2="-25" stroke="#1E293B" strokeWidth="2"/></g>;
+            const RHalf = ({x}) => <g transform={`translate(${x}, 25)`}><ellipse cx="0" cy="0" rx="6" ry="4" fill="none" stroke="#1E293B" strokeWidth="2" transform="rotate(-20)"/><line x1="5" y1="0" x2="5" y2="-25" stroke="#1E293B" strokeWidth="2"/></g>;
+            const RWhole = ({x}) => <g transform={`translate(${x}, 25)`}><ellipse cx="0" cy="0" rx="8" ry="6" fill="none" stroke="#1E293B" strokeWidth="2" transform="rotate(-20)"/></g>;
+            const RPairedEighths = ({x}) => (
+                <g transform={`translate(${x}, 25)`}>
+                    <g transform="translate(0,0)">
+                        <ellipse cx="0" cy="0" rx="6" ry="4" fill="#1E293B" transform="rotate(-20)"/>
+                        <line x1="5" y1="0" x2="5" y2="-25" stroke="#1E293B" strokeWidth="2"/>
+                    </g>
+                    <g transform="translate(30,0)">
+                        <ellipse cx="0" cy="0" rx="6" ry="4" fill="#1E293B" transform="rotate(-20)"/>
+                        <line x1="5" y1="0" x2="5" y2="-25" stroke="#1E293B" strokeWidth="2"/>
+                    </g>
+                    <line x1="5" y1="-25" x2="35" y2="-25" stroke="#1E293B" strokeWidth="4.5"/>
+                </g>
+            );
+
+            const RhythmLine = ({ children }) => (
+                <svg viewBox="0 0 240 40" className="w-full h-full pointer-events-none drop-shadow-sm">
+                    <line x1="5" y1="25" x2="235" y2="25" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round"/>
+                    {/* Bar lines */}
+                    <line x1="5" y1="15" x2="5" y2="35" stroke="#94A3B8" strokeWidth="2"/>
+                    <line x1="235" y1="15" x2="235" y2="35" stroke="#94A3B8" strokeWidth="2"/>
+                    {children}
+                </svg>
+            );
+
+            // Task Definitions (10 tasks, expanded with paired eighth notes)
+            const tasks = [
+                { // 1
+                    audio: [{type: 1}, {type: 1}, {type: 1}, {type: 1}],
+                    correct: 0,
+                    options: [
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RQuarter x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RHalf x={20}/><RHalf x={120}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RHalf x={120}/></RhythmLine>
+                    ]
+                },
+                { // 2
+                    audio: [{type: 2}, {type: 2}],
+                    correct: 1,
+                    options: [
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RQuarter x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RHalf x={20}/><RHalf x={120}/></RhythmLine>,
+                        <RhythmLine><RWhole x={100}/></RhythmLine>
+                    ]
+                },
+                { // 3
+                    audio: [{type: 2}, {type: 1}, {type: 1}],
+                    correct: 2,
+                    options: [
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RHalf x={120}/></RhythmLine>,
+                        <RhythmLine><RWhole x={100}/></RhythmLine>,
+                        <RhythmLine><RHalf x={20}/><RQuarter x={120}/><RQuarter x={170}/></RhythmLine>
+                    ]
+                },
+                { // 4: Q, Q, 2E, Q
+                    audio: [{type: 1}, {type: 1}, {type: 0.5}, {type: 0.5}, {type: 1}],
+                    correct: 0,
+                    options: [
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RPairedEighths x={70}/><RQuarter x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RHalf x={20}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>
+                    ]
+                },
+                { // 5: H, 2E, Q
+                    audio: [{type: 2}, {type: 0.5}, {type: 0.5}, {type: 1}],
+                    correct: 1,
+                    options: [
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RHalf x={20}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RWhole x={100}/></RhythmLine>
+                    ]
+                },
+                { // 6: Q, 2E, 2E, Q
+                    audio: [{type: 1}, {type: 0.5}, {type: 0.5}, {type: 0.5}, {type: 0.5}, {type: 1}],
+                    correct: 2,
+                    options: [
+                        <RhythmLine><RPairedEighths x={20}/><RPairedEighths x={70}/><RHalf x={120}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RPairedEighths x={70}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>
+                    ]
+                },
+                { // 7: 2E, Q, H
+                    audio: [{type: 0.5}, {type: 0.5}, {type: 1}, {type: 2}],
+                    correct: 0,
+                    options: [
+                        <RhythmLine><RPairedEighths x={20}/><RQuarter x={70}/><RHalf x={120}/></RhythmLine>,
+                        <RhythmLine><RHalf x={20}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RHalf x={120}/></RhythmLine>
+                    ]
+                },
+                { // 8: Whole
+                    audio: [{type: 4}],
+                    correct: 1,
+                    options: [
+                        <RhythmLine><RHalf x={20}/><RHalf x={120}/></RhythmLine>,
+                        <RhythmLine><RWhole x={100}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RQuarter x={120}/><RQuarter x={170}/></RhythmLine>
+                    ]
+                },
+                { // 9: 4E, H
+                    audio: [{type: 0.5}, {type: 0.5}, {type: 0.5}, {type: 0.5}, {type: 2}],
+                    correct: 2,
+                    options: [
+                        <RhythmLine><RHalf x={20}/><RPairedEighths x={120}/><RPairedEighths x={170}/></RhythmLine>,
+                        <RhythmLine><RPairedEighths x={20}/><RQuarter x={70}/><RQuarter x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RPairedEighths x={20}/><RPairedEighths x={70}/><RHalf x={120}/></RhythmLine>
+                    ]
+                },
+                { // 10: 2E, Q, 2E, Q
+                    audio: [{type: 0.5}, {type: 0.5}, {type: 1}, {type: 0.5}, {type: 0.5}, {type: 1}],
+                    correct: 0,
+                    options: [
+                        <RhythmLine><RPairedEighths x={20}/><RQuarter x={70}/><RPairedEighths x={120}/><RQuarter x={170}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RPairedEighths x={70}/><RQuarter x={120}/><RPairedEighths x={170}/></RhythmLine>,
+                        <RhythmLine><RQuarter x={20}/><RQuarter x={70}/><RPairedEighths x={120}/><RPairedEighths x={170}/></RhythmLine>
+                    ]
+                }
+            ];
+
+            const handlePlayRhythm = () => {
+                if (isPlaying) return;
+                setIsPlaying(true);
+                const task = tasks[currentTask];
+                const totalDur = task.audio.reduce((sum, n) => sum + (n.type * (60/90)), 0);
+                
+                playRhythm(task.audio, 90);
+                setTimeout(() => setIsPlaying(false), (totalDur * 1000) + 500); 
+            };
+
+            const handleGuess = (id) => {
+                if (isPlaying) return;
+                setSelectedId(id);
+                const correct = id === tasks[currentTask].correct; 
+                setIsCorrect(correct);
+                setShowFeedback(true);
+                
+                if (correct) {
+                    playCorrectSound();
+                    triggerCelebration();
+                    setTimeout(() => { 
+                        setShowFeedback(false); 
+                        setSelectedId(null);
+                        if (score < 9) { // Now up to 10 points
+                            setScore(s => s + 1);
+                            setCurrentTask(t => t + 1);
+                        } else {
+                            setScore(10);
+                        }
+                    }, 1500);
+                } else {
+                    playWrongSound();
+                    setTimeout(() => { setShowFeedback(false); setSelectedId(null); }, 1200);
+                }
+            };
+
+            if (score === 10) {
+                return (
+                    <div className="glass-panel rounded-3xl p-12 max-w-2xl w-full text-center bounce-in mx-4">
+                        <div className="text-8xl mb-6">🥁🏆</div>
+                        <h2 className="text-5xl font-black text-teal-600 mb-6">Король Ритму!</h2>
+                        <p className="text-2xl font-bold">Ти зловив усі 10 супер-ритмів!</p>
+                        <button onClick={() => { setScore(0); setCurrentTask(0); }} className="mt-8 bg-teal-500 text-white font-black py-3 px-8 rounded-full text-xl hover:scale-110 transition-transform">Грати ще раз</button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="glass-panel rounded-3xl p-8 max-w-5xl w-full text-center fade-in mx-4 my-8 relative">
+                    <ScoreBoard score={score} maxScore={10} />
+                    <h2 className="text-3xl md:text-5xl font-black text-teal-700 mb-4">Спіймай ритм! 🥁</h2>
+                    <p className="text-xl text-gray-700 font-bold mb-6">Слухай уважно і вибери правильний малюнок!</p>
+                    
+                    <button 
+                        onClick={handlePlayRhythm}
+                        disabled={isPlaying}
+                        className={`
+                            w-32 h-32 mx-auto rounded-full mb-10 flex justify-center items-center text-6xl shadow-xl transition-all border-4 border-white
+                            ${isPlaying ? 'bg-yellow-400 scale-110 pulse-btn' : 'bg-pink-500 hover:bg-pink-600 hover:-translate-y-2'}
+                        `}
+                    >
+                        {isPlaying ? '🎶' : '▶️'}
+                    </button>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        {tasks[currentTask].options.map((opt, idx) => (
+                            <div 
+                                key={idx}
+                                onClick={() => handleGuess(idx)}
+                                className={`
+                                    bg-white border-4 rounded-3xl p-4 cursor-pointer flex flex-col items-center justify-center min-h-[140px] shadow-md transition-all
+                                    ${selectedId === idx ? (isCorrect ? 'border-green-500 bg-green-50 scale-105' : 'border-red-500 bg-red-50 shake') : 'border-gray-200 hover:border-teal-400 hover:scale-105'}
+                                `}
+                            >
+                                {opt}
+                            </div>
+                        ))}
+                    </div>
+
+                    {showFeedback && (
+                        <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl font-black p-8 rounded-3xl shadow-2xl z-10 ${isCorrect ? 'bg-green-400 text-white' : 'bg-red-400 text-white shake'}`}>
+                            {isCorrect ? 'Супер! Ти музикант! 🏆' : 'Не зовсім... Послухай ще! 😉'}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const MathGame = ({ triggerCelebration }) => {
+            const [score, setScore] = useState(0);
+            const [currentTask, setCurrentTask] = useState(0);
+            const [selected, setSelected] = useState(null);
+            const [isWrong, setIsWrong] = useState(false);
+
+            const tasks = [
+                { // 1
+                    q: "Додаємо дві ЧЕТВЕРТНІ нотки. Що вийде?",
+                    eq: [{ s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119135;', c: 'text-green-600' }],
+                    correct: 1,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119136;', name: 'Восьма', color: 'text-purple-600' }
+                    ]
+                },
+                { // 2
+                    q: "Дві ПОЛОВИННІ нотки разом стануть...",
+                    eq: [{ s: '&#119134;', c: 'text-blue-500' }, '+', { s: '&#119134;', c: 'text-blue-500' }],
+                    correct: 0,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119135;', name: 'Четвертна', color: 'text-green-600' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' }
+                    ]
+                },
+                { // 3
+                    q: "Дві короткі ВОСЬМІ нотки зліплюються в одну...",
+                    eq: [{ s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }],
+                    correct: 2,
+                    options: [
+                        { symbol: '&#119133;', name: 'Цілу', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинну', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертну', color: 'text-green-600' }
+                    ]
+                },
+                { // 4
+                    q: "Четвертна і дві восьмі. Разом це...",
+                    eq: [{ s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }],
+                    correct: 1,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертна', color: 'text-green-600' }
+                    ]
+                },
+                { // 5
+                    q: "Аж чотири ВОСЬМІ нотки! На що вони перетворяться?",
+                    eq: [{ s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }],
+                    correct: 1,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертна', color: 'text-green-600' }
+                    ]
+                },
+                { // 6
+                    q: "Половинна і дві четвертні. Яка це велика нота?",
+                    eq: [{ s: '&#119134;', c: 'text-blue-500' }, '+', { s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119135;', c: 'text-green-600' }],
+                    correct: 0,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертна', color: 'text-green-600' }
+                    ]
+                },
+                { // 7
+                    q: "Дві четвертні, дві восьмі і ще одна четвертна! Ого!",
+                    eq: [{ s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119135;', c: 'text-green-600' }],
+                    correct: 0,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119136;', name: 'Восьма', color: 'text-purple-600' }
+                    ]
+                },
+                { // 8
+                    q: "Половинна, дві восьмі і четвертна. Скільки разом?",
+                    eq: [{ s: '&#119134;', c: 'text-blue-500' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119135;', c: 'text-green-600' }],
+                    correct: 0,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертна', color: 'text-green-600' }
+                    ]
+                },
+                { // 9
+                    q: "Чотири ЧЕТВЕРТНІ нотки - це одна довга...",
+                    eq: [{ s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119135;', c: 'text-green-600' }, '+', { s: '&#119135;', c: 'text-green-600' }],
+                    correct: 0,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119136;', name: 'Восьма', color: 'text-purple-600' }
+                    ]
+                },
+                { // 10
+                    q: "Дві восьмі, половинна і четвертна! Супер-задача!",
+                    eq: [{ s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119136;', c: 'text-purple-600' }, '+', { s: '&#119134;', c: 'text-blue-500' }, '+', { s: '&#119135;', c: 'text-green-600' }],
+                    correct: 0,
+                    options: [
+                        { symbol: '&#119133;', name: 'Ціла', color: 'text-red-500' },
+                        { symbol: '&#119134;', name: 'Половинна', color: 'text-blue-500' },
+                        { symbol: '&#119135;', name: 'Четвертна', color: 'text-green-600' }
+                    ]
+                }
+            ];
+
+            const handleSelect = (idx) => {
+                if (selected !== null) return;
+                setSelected(idx);
+                if (idx === tasks[currentTask].correct) {
+                    playCorrectSound();
+                    triggerCelebration();
+                    setTimeout(() => {
+                        setSelected(null);
+                        if (score < 9) { // Now up to 10 points
+                            setScore(s => s + 1);
+                            setCurrentTask(t => t + 1);
+                        } else {
+                            setScore(10);
+                        }
+                    }, 1500);
+                } else {
+                    playWrongSound();
+                    setIsWrong(true);
+                    setTimeout(() => {
+                        setIsWrong(false);
+                        setSelected(null);
+                    }, 1000);
+                }
+            };
+
+            if (score === 10) {
+                return (
+                    <div className="glass-panel rounded-3xl p-12 max-w-2xl w-full text-center bounce-in mx-4">
+                        <div className="text-8xl mb-6">🧮🏆</div>
+                        <h2 className="text-5xl font-black text-blue-600 mb-6">Музичний Професор!</h2>
+                        <p className="text-2xl font-bold">Ти з легкістю вирішив усі 10 прикладів!</p>
+                        <button onClick={() => { setScore(0); setCurrentTask(0); }} className="mt-8 bg-blue-500 text-white font-black py-3 px-8 rounded-full text-xl hover:scale-110 transition-transform">Грати ще раз</button>
+                    </div>
+                );
+            }
+
+            const task = tasks[currentTask];
+
+            return (
+                <div className="glass-panel rounded-3xl p-6 md:p-10 max-w-5xl w-full text-center fade-in mx-4 my-8">
+                    <ScoreBoard score={score} maxScore={10} />
+                    <h2 className="text-3xl md:text-4xl font-black text-blue-700 mb-4">{task.q}</h2>
+                    <p className="text-xl text-gray-700 font-bold mb-8">Порахуй і обери правильну нотку-відповідь!</p>
+                    
+                    <div className="flex flex-col items-center justify-center mb-10 bg-white/60 p-3 sm:p-8 rounded-3xl shadow-inner border-4 border-blue-200">
+                        <div className="flex items-center gap-2 md:gap-6 flex-wrap justify-center">
+                            {task.eq.map((item, idx) => (
+                                typeof item === 'string'
+                                    ? <span key={idx} className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-400">{item}</span>
+                                    : <span key={idx} className={`text-4xl sm:text-5xl md:text-7xl note-symbol ${item.c}`} dangerouslySetInnerHTML={{__html: item.s}}></span>
+                            ))}
+                            <span className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-400">=</span>
+                            <span className="text-4xl sm:text-5xl md:text-7xl text-gray-300 font-black">?</span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                        {task.options.map((opt, idx) => (
+                            <div 
+                                key={idx}
+                                onClick={() => handleSelect(idx)}
+                                className={`
+                                    bg-white p-4 rounded-2xl border-4 cursor-pointer flex flex-col items-center justify-center min-h-[140px] transition-all shadow-md
+                                    ${selected === idx ? (idx === task.correct ? 'border-green-500 bg-green-100 scale-105' : 'border-red-500 bg-red-100 shake') : 'border-gray-200 hover:border-blue-400 hover:scale-105'}
+                                    ${isWrong && selected === idx ? 'shake' : ''}
+                                `}
+                            >
+                                <div className={`text-6xl mb-2 note-symbol ${opt.color}`} dangerouslySetInnerHTML={{__html: opt.symbol}}></div>
+                                <p className="text-xl font-black text-gray-800">{opt.name}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const RaceGame = ({ triggerCelebration }) => {
+            const raceTasks = [
+                { duration: 1, name: 'Четвертна нота' },
+                { duration: 2, name: 'Половинна нота' },
+                { duration: 0.5, name: 'Восьма нота' },
+                { duration: 4, name: 'Ціла нота' },
+                { duration: 1, name: 'Четвертна нота' },
+                { duration: 0.5, name: 'Восьма нота' },
+                { duration: 2, name: 'Половинна нота' },
+                { duration: 1, name: 'Четвертна нота' },
+                { duration: 4, name: 'Ціла нота' },
+                { duration: 2, name: 'Половинна нота' }
+            ];
+            const notes = [
+                { duration: 4, name: 'Ціла', symbol: '&#119133;', color: 'text-red-500', border: 'hover:border-red-300' },
+                { duration: 2, name: 'Половинна', symbol: '&#119134;', color: 'text-blue-500', border: 'hover:border-blue-300' },
+                { duration: 1, name: 'Четвертна', symbol: '&#119135;', color: 'text-green-600', border: 'hover:border-green-300' },
+                { duration: 0.5, name: 'Восьма', symbol: '&#119136;', color: 'text-purple-600', border: 'hover:border-purple-300' }
+            ];
+            const totalBeats = raceTasks.reduce((sum, task) => sum + task.duration, 0);
+            const durationLabel = duration => duration === 0.5 ? 'пів рахунку' : `${duration} ${duration === 1 ? 'рахунок' : 'рахунки'}`;
+            const roadRef = useRef(null);
+            const currentDistanceRef = useRef(0);
+            const [currentTask, setCurrentTask] = useState(0);
+            const [distance, setDistance] = useState(0);
+            const [targetDistance, setTargetDistance] = useState(0);
+            const [checkpoints, setCheckpoints] = useState([]);
+            const [carPosition, setCarPosition] = useState({ x: 85, y: 540 });
+            const [carAngle, setCarAngle] = useState(0);
+            const [moving, setMoving] = useState(false);
+            const [wrongChoice, setWrongChoice] = useState(null);
+            const [feedback, setFeedback] = useState('');
+            const [finished, setFinished] = useState(false);
+            useEffect(() => {
+                const road = roadRef.current;
+                if (!road) return;
+                const length = road.getTotalLength();
+                const start = road.getPointAtLength(0);
+                setCarPosition({ x: start.x, y: start.y });
+
+                let beats = 0;
+                const stops = raceTasks.map(task => {
+                    beats += task.duration;
+                    const point = road.getPointAtLength(length * beats / totalBeats);
+                    return { x: point.x, y: point.y };
+                });
+                setCheckpoints(stops);
+            }, []);
+
+            useEffect(() => {
+                if (!moving) return undefined;
+
+                const oscillator = audioCtx.createOscillator();
+                const filter = audioCtx.createBiquadFilter();
+                const gain = audioCtx.createGain();
+                filter.type = 'lowpass';
+                filter.frequency.value = 150;
+                oscillator.type = 'triangle';
+                oscillator.frequency.value = 62;
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.025, audioCtx.currentTime + 0.15);
+                oscillator.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                oscillator.start();
+
+                return () => {
+                    gain.gain.cancelScheduledValues(audioCtx.currentTime);
+                    gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.04);
+                    oscillator.stop(audioCtx.currentTime + 0.16);
+                };
+            }, [moving]);
+
+            useEffect(() => {
+                if (!moving || !roadRef.current) return undefined;
+
+                const road = roadRef.current;
+                const from = currentDistanceRef.current;
+                const to = targetDistance;
+                const length = road.getTotalLength();
+                const moveDuration = raceTasks[currentTask].duration * 520;
+                let animationFrame;
+                let startTime;
+
+                const animate = timestamp => {
+                    if (startTime === undefined) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / moveDuration, 1);
+                    const easedProgress = progress * progress * (3 - 2 * progress);
+                    const nextDistance = from + (to - from) * easedProgress;
+                    const point = road.getPointAtLength(nextDistance);
+                    const nextPoint = road.getPointAtLength(Math.min(nextDistance + 1, length));
+                    setCarPosition({ x: point.x, y: point.y });
+                    setCarAngle(Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x) * 180 / Math.PI + 90);
+                    setDistance(nextDistance);
+
+                    if (progress < 1) {
+                        animationFrame = window.requestAnimationFrame(animate);
+                    } else {
+                        currentDistanceRef.current = to;
+                        setDistance(to);
+                        setMoving(false);
+                        if (currentTask === raceTasks.length - 1) {
+                            setFinished(true);
+                            setFeedback('Фініш! Ти справжній чемпіон! 🏆');
+                            playCorrectSound();
+                            triggerCelebration();
+                        } else {
+                            setCurrentTask(step => step + 1);
+                            setFeedback('Чудово! Авто дісталося наступної зупинки 🚗');
+                        }
+                    }
+                };
+
+                animationFrame = window.requestAnimationFrame(animate);
+                return () => window.cancelAnimationFrame(animationFrame);
+            }, [moving, targetDistance]);
+
+            const chooseNote = note => {
+                if (moving || finished) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                if (note.duration !== raceTasks[currentTask].duration) {
+                    setWrongChoice(note.duration);
+                    setFeedback('Не зовсім! Спробуй ще раз 🙂');
+                    playWrongSound();
+                    window.setTimeout(() => setWrongChoice(null), 500);
+                    return;
+                }
+
+                const roadLength = roadRef.current.getTotalLength();
+                const nextDistance = Math.min(currentDistanceRef.current + roadLength * note.duration / totalBeats, roadLength);
+                setWrongChoice(null);
+                setFeedback(`Правильно! ${note.name} — ${durationLabel(note.duration)} 🚗`);
+                playCorrectSound();
+                setTargetDistance(nextDistance);
+                setMoving(true);
+            };
+
+            const restartRace = () => {
+                currentDistanceRef.current = 0;
+                setDistance(0);
+                setTargetDistance(0);
+                setCurrentTask(0);
+                setCarPosition({ x: 85, y: 540 });
+                setCarAngle(0);
+                setMoving(false);
+                setFinished(false);
+                setWrongChoice(null);
+                setFeedback('');
+            };
+
+            const length = roadRef.current ? roadRef.current.getTotalLength() : 1;
+            const progressPercent = Math.round(distance / length * 100);
+
+            return (
+                <div className="glass-panel race-game-panel rounded-3xl p-4 sm:p-6 md:p-8 lg:p-4 max-w-6xl lg:max-w-[84rem] w-full text-center fade-in mx-4 my-8 lg:my-2">
+                    <div className="relative mb-5 lg:mb-2 text-center">
+                        <div>
+                            <h2 className="text-2xl sm:text-4xl font-black text-indigo-700">Музичні перегони 🏁</h2>
+                            <p className="text-sm sm:text-lg font-bold text-gray-600">Вибирай ноту та рушай до фінішу!</p>
+                        </div>
+                    </div>
+
+                    {!finished && (
+                        <div className="flex justify-center flex-wrap gap-2 mb-4 lg:mb-2" aria-label={`Завдання ${currentTask + 1} з ${raceTasks.length}`}>
+                            {raceTasks.map((task, index) => (
+                                <span key={index} className={`w-3 h-3 rounded-full ${index < currentTask ? 'bg-green-500' : index === currentTask ? 'bg-yellow-400 ring-2 ring-yellow-200' : 'bg-gray-300'}`} />
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(270px,0.72fr)_minmax(0,1.6fr)] lg:items-stretch lg:gap-4">
+                        <section className="flex flex-col justify-center bg-white/60 rounded-3xl p-3 sm:p-5 lg:p-5 border-2 border-white">
+                            {finished ? (
+                                <div className="race-finish py-4">
+                                    <div className="text-6xl sm:text-8xl mb-3">🏆🎉🏎️</div>
+                                    <h3 className="text-2xl sm:text-4xl font-black text-orange-500 mb-3">Перегони завершено!</h3>
+                                    <p className="text-lg sm:text-xl font-bold text-gray-700 mb-5">Ти подолав усю дорогу, уважно вибираючи тривалості нот!</p>
+                                    <button onClick={restartRace} className="bg-green-500 text-white font-black py-3 px-7 rounded-full text-lg sm:text-xl hover:bg-green-600 transition-colors">Ще раз!</button>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="text-base sm:text-lg font-bold text-gray-700 mb-1">Обери тривалість ноти, щоб авто рушило</p>
+                                    <h3 className="text-2xl sm:text-3xl font-black text-indigo-700 mb-4">{raceTasks[currentTask].name}</h3>
+                                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                                        {notes.map(note => (
+                                            <button
+                                                key={note.duration}
+                                                type="button"
+                                                onClick={() => chooseNote(note)}
+                                                disabled={moving}
+                                                className={`flex min-h-24 flex-col items-center justify-center rounded-2xl border-4 bg-[#f7f4ef] p-2 sm:p-3 shadow-md transition-all ${note.border} ${wrongChoice === note.duration ? 'race-wrong border-red-400 bg-red-50' : 'border-gray-200'} ${moving ? 'opacity-60 cursor-wait' : 'hover:-translate-y-1 hover:shadow-lg'}`}
+                                            >
+                                                <span className={`note-symbol text-4xl sm:text-5xl ${note.color}`} dangerouslySetInnerHTML={{__html: note.symbol}} />
+                                                <span className="text-xs sm:text-sm font-bold text-gray-500">{durationLabel(note.duration)}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p aria-live="polite" className={`min-h-12 mt-4 flex items-center justify-center text-sm sm:text-base font-extrabold ${wrongChoice !== null ? 'text-red-600' : 'text-indigo-700'}`}>
+                                        {feedback || 'Кожна правильна нота просуває авто на відповідну відстань.'}
+                                    </p>
+                                    <div role="progressbar" aria-label="Пройдена дорога" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent} className="w-full h-3 bg-white rounded-full overflow-hidden shadow-inner">
+                                        <div className="h-full bg-gradient-to-r from-green-400 to-yellow-400 transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+                                    </div>
+                                </>
+                            )}
+                        </section>
+
+                        <section className="w-full min-w-0 rounded-3xl border-2 border-white bg-[#e9f8f3] p-1 sm:p-3 shadow-inner" aria-label="Музичний лабіринт">
+                            <svg viewBox="0 40 1000 540" className="race-track" role="img" aria-label="Довга звивиста гоночна дорога з десятьма контрольними точками">
+                                <defs>
+                                    <filter id="raceRoadShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="0" dy="7" stdDeviation="5" floodColor="#334155" floodOpacity=".3" />
+                                    </filter>
+                                    <path id="raceRoadPath" d="M 85 540 L 85 465 C 85 420 230 420 230 465 L 230 520 C 230 565 380 565 380 520 L 380 455 C 380 410 285 410 285 365 L 285 300 C 285 255 430 255 430 300 L 430 350 C 430 395 575 395 575 350 L 575 285 C 575 240 480 240 480 195 L 480 130 C 480 85 625 85 625 130 L 625 185 C 625 230 770 230 770 185 L 770 120 C 770 75 910 75 910 120 L 910 170" />
+                                </defs>
+                                <rect x="0" y="0" width="1000" height="620" rx="24" fill="#e9f8f3" />
+                                <path d="M 0 155 Q 145 85 300 155 T 620 140 T 1000 155 L 1000 210 Q 830 175 700 220 T 360 210 T 0 220 Z" fill="#d9f1df" opacity=".55" />
+                                <path d="M 0 470 Q 150 400 300 475 T 630 465 T 1000 480 L 1000 620 L 0 620 Z" fill="#d7eee1" opacity=".65" />
+
+                                {[
+                                    [150, 105, 0.8], [350, 115, 0.65], [815, 300, 0.8],
+                                    [130, 330, 0.7], [670, 505, 0.8], [940, 390, 0.75],
+                                    [375, 205, 0.6], [735, 70, 0.65], [535, 500, 0.6]
+                                ].map(([x, y, scale], index) => (
+                                    <g key={`tree-${index}`} transform={`translate(${x} ${y}) scale(${scale})`}>
+                                        <ellipse cx="0" cy="34" rx="25" ry="7" fill="#91cbb6" opacity=".45" />
+                                        <rect x="-4" y="3" width="8" height="32" rx="4" fill="#79634f" />
+                                        <circle cx="0" cy="-11" r="21" fill={index % 2 ? '#69ad82' : '#7dbb83'} />
+                                        <circle cx="-13" cy="0" r="15" fill={index % 2 ? '#7fc38b' : '#91cb8e'} />
+                                        <circle cx="13" cy="1" r="15" fill={index % 2 ? '#579b75' : '#6eaf7b'} />
+                                    </g>
+                                ))}
+                                {[[250, 145], [925, 260], [155, 390], [720, 455], [845, 455], [355, 125], [560, 95]].map(([x, y], index) => (
+                                    <g key={`flower-${index}`} transform={`translate(${x} ${y})`}>
+                                        <circle cy="0" r="4" fill="#f4bd58" />
+                                        <circle cx="0" cy="-6" r="4" fill="#f18491" />
+                                        <circle cx="6" cy="0" r="4" fill="#f18491" />
+                                        <circle cy="6" r="4" fill="#f18491" />
+                                        <circle cx="-6" cy="0" r="4" fill="#f18491" />
+                                    </g>
+                                ))}
+
+                                <use href="#raceRoadPath" fill="none" stroke="#83c6c0" strokeWidth="66" strokeLinecap="round" strokeLinejoin="round" />
+                                <use href="#raceRoadPath" fill="none" stroke="#fff8e9" strokeWidth="56" strokeLinecap="round" strokeLinejoin="round" />
+                                <use href="#raceRoadPath" fill="none" stroke="#39364f" strokeWidth="46" strokeLinecap="round" strokeLinejoin="round" filter="url(#raceRoadShadow)" />
+                                <use href="#raceRoadPath" fill="none" stroke="#f9df8a" strokeWidth="4" strokeDasharray="16 19" strokeLinecap="round" />
+
+                                {checkpoints.map((point, index) => (
+                                    <g key={index}>
+                                        <circle cx={point.x} cy={point.y} r="19" fill={index < currentTask || finished ? '#86efac' : '#f8e6b4'} stroke="#f06b78" strokeWidth="6" />
+                                        <circle cx={point.x} cy={point.y} r="7" fill="#fff" />
+                                    </g>
+                                ))}
+                                <g transform="translate(910 170)">
+                                    <circle r="31" fill={finished ? '#facc15' : '#e85d75'} stroke="#83c6c0" strokeWidth="8" />
+                                    <text x="0" y="10" textAnchor="middle" fontSize="28">🏁</text>
+                                </g>
+                                <path ref={roadRef} d="M 85 540 L 85 465 C 85 420 230 420 230 465 L 230 520 C 230 565 380 565 380 520 L 380 455 C 380 410 285 410 285 365 L 285 300 C 285 255 430 255 430 300 L 430 350 C 430 395 575 395 575 350 L 575 285 C 575 240 480 240 480 195 L 480 130 C 480 85 625 85 625 130 L 625 185 C 625 230 770 230 770 185 L 770 120 C 770 75 910 75 910 120 L 910 170" fill="none" stroke="transparent" strokeWidth="1" />
+                                <g transform={`translate(${carPosition.x} ${carPosition.y}) rotate(${carAngle})`}>
+                                    <rect x="-17" y="-27" width="34" height="54" rx="11" fill="#e43f48" stroke="#9f2737" strokeWidth="3" />
+                                    <rect x="-12" y="-19" width="24" height="15" rx="5" fill="#b9edf0" />
+                                    <rect x="-12" y="7" width="24" height="10" rx="4" fill="#ffb4a7" />
+                                    <rect x="-21" y="-18" width="6" height="13" rx="3" fill="#343047" />
+                                    <rect x="15" y="-18" width="6" height="13" rx="3" fill="#343047" />
+                                    <rect x="-21" y="10" width="6" height="13" rx="3" fill="#343047" />
+                                    <rect x="15" y="10" width="6" height="13" rx="3" fill="#343047" />
+                                </g>
+                                <text x="145" y="580" textAnchor="middle" fontSize="19" fontWeight="900" fill="#374151">СТАРТ</text>
+                            </svg>
+                        </section>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [currentTab, setCurrentTab] = useState('overview');
+            const [showStars, setShowStars] = useState(false);
+
+            const triggerCelebration = () => {
+                setShowStars(true);
+                setTimeout(() => setShowStars(false), 2000);
+            };
+
+            const tabs = [
+                { id: 'overview', label: 'Дерево', icon: '🌳' },
+                { id: 'pizza', label: 'Піца-ноти', icon: '🍕' },
+                { id: 'duration', label: 'Що довше?', icon: '🐰' },
+                { id: 'rhythm', label: 'Спіймай ритм', icon: '🥁' },
+                { id: 'math', label: 'Математика', icon: '➕' },
+                { id: 'race', label: 'Перегони', icon: '🏎️' }
+            ];
+
+            return (
+                <div className="w-full flex flex-col items-center min-h-screen">
+                    <CelebrationStars active={showStars} />
+                    
+                    {/* Navigation Bar */}
+                    <nav className={`w-full sticky top-0 z-40 bg-white/80 backdrop-blur-md shadow-md p-4 mb-4 flex justify-center overflow-x-auto ${currentTab === 'race' ? 'race-nav' : ''}`}>
+                        <div className="flex gap-2 min-w-max px-2">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setCurrentTab(tab.id)}
+                                    className={`nav-btn flex items-center gap-2 whitespace-nowrap px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-lg rounded-full font-bold border-2 
+                                        ${currentTab === tab.id ? 'active' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <span>{tab.icon}</span>
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    {/* Content Area */}
+                    <main className={`w-full flex-1 flex justify-center items-start pt-4 pb-12 ${currentTab === 'race' ? 'race-main' : ''}`}>
+                        {currentTab === 'overview' && <Overview />}
+                        {currentTab === 'pizza' && <PizzaGame triggerCelebration={triggerCelebration} />}
+                        {currentTab === 'duration' && <DurationGame triggerCelebration={triggerCelebration} />}
+                        {currentTab === 'rhythm' && <RhythmGame triggerCelebration={triggerCelebration} />}
+                        {currentTab === 'math' && <MathGame triggerCelebration={triggerCelebration} />}
+                        {currentTab === 'race' && <RaceGame triggerCelebration={triggerCelebration} />}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
