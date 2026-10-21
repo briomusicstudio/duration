@@ -3,7 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Музичні Тривалості для Дітей</title>
+    <meta name="description" content="Інтерактивно вивчай музичні тривалості, ноти й ритми: дерево тривалостей, музична математика, лабіринт і перегони.">
+    <meta name="keywords" content="музичні тривалості, тривалості нот, музичні ноти, музичний ритм, музична математика, музичний лабіринт, музичні перегони">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#34d399">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="uk_UA">
+    <meta property="og:site_name" content="Музичні тривалості">
+    <meta property="og:title" content="Музичні тривалості — ноти, ритм та інтерактивні ігри">
+    <meta property="og:description" content="Вивчай тривалості нот, слухай ритми, розв'язуй музичні приклади та проходь інтерактивні перегони.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Музичні тривалості — ноти, ритм та інтерактивні ігри">
+    <meta name="twitter:description" content="Вивчай тривалості нот, слухай ритми, розв'язуй музичні приклади та проходь інтерактивні перегони.">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <title>Музичні тривалості — ноти, ритм та інтерактивні ігри</title>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Музичні тривалості",
+            "description": "Інтерактивне вивчення тривалостей нот, ритмів і музичної математики.",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Any",
+            "inLanguage": "uk",
+            "isAccessibleForFree": true
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -185,6 +210,12 @@
 </head>
 <body>
     <div id="root"></div>
+    <noscript>
+        <main>
+            <h1>Музичні тривалості — ноти та ритми</h1>
+            <p>Вивчай тривалості нот, слухай ритми та розв'язуй приклади з музичної математики. Увімкни JavaScript, щоб скористатися інтерактивними іграми.</p>
+        </main>
+    </noscript>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
